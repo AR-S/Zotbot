@@ -119,7 +119,7 @@ def main():
 
 if __name__ == '__main__':
     args = docopt(__doc__, version='0.1.1')
-    logging.basicConfig(filename='/var/log/zotbot/zotbot.log', filemode='w+', level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
+    logging.basicConfig(filename='/var/log/zotbot/zotbot.log', filemode='a+', level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
     load_config(args['--config'])
     main()
     save_config(args['--config'])
