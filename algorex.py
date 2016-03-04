@@ -1,4 +1,14 @@
 #!/usr/bin/env python
+"""
+Usage:
+  algorex.py [--config=<path>]
+  algorex.py -h | --help | --version
+
+Options:
+  -h --help                 show this help text
+  --config=<path>           path to configuration file [default: config.json]
+"""
+
 import json
 import logging
 from datetime import datetime
@@ -8,6 +18,8 @@ from mailprovider import ImapListener
 from collections import Counter
 import string
 from textblob import TextBlob
+from docopt import docopt
+
 
 PHRASES = [
 "A HUMAN A DAY KEEPS KEYBOARD SHINY",
@@ -58,9 +70,19 @@ Zotbot
 
 CONFIG = None
 
-with open('config.json') as f:
-    CONFIG = json.load( f )
-    #pprint(CONFIG)
+
+def load_config(fname):
+    global CONFIG
+    logging.debug("Loading config form {0}".format(fname) )
+    with open(fname) as f:
+        CONFIG = json.load( f )
+        #pprint(CONFIG)
+def save_config(fname):
+    global CONFIG
+    CONFIG['last_check'] = str(datetime.now())
+    with open(fname, 'w') as f:
+        f.write( json.dumps(CONFIG) )
+
 
 def count_letters(word, valid_letters=string.ascii_letters):
     count = Counter(word) # this counts all the letters, including invalid ones
@@ -95,10 +117,9 @@ def main():
 
         mp.reply_to_message(msgid,  replytxt)
 
-    CONFIG['last_check'] = str(datetime.now())
-    with open('config.json', 'w') as f:
-        f.write( json.dumps(CONFIG) )
-
 if __name__ == '__main__':
+    args = docopt(__doc__, version='0.1.1')
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
+    load_config(args['--config'])
     main()
+    save_config(args['--config'])
